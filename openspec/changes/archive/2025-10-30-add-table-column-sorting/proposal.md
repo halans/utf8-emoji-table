@@ -2,7 +2,7 @@
 
 **Change ID**: `add-table-column-sorting`
 
-## Problem Statement
+## Why
 
 Users currently cannot sort the emoji table by different columns, making it difficult to:
 - Find emojis with specific characteristics (e.g., highest byte count, alphabetical order)
@@ -11,7 +11,7 @@ Users currently cannot sort the emoji table by different columns, making it diff
 
 The current table display shows emojis in their original file order, which may not match user needs for different analysis or browsing patterns.
 
-## Proposed Solution
+## What Changes
 
 Add interactive column sorting functionality to the emoji table that allows users to:
 - Click column headers to sort data in ascending/descending order
