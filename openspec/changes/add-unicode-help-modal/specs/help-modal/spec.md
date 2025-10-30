@@ -27,6 +27,7 @@ The application MUST provide an educational help modal that explains Unicode con
 **Then** the modal contains a section explaining Unicode basics
 **And** the modal contains a section explaining code point notation (U+XXXX)
 **And** the modal contains a section explaining UTF-8 encoding
+**And** the modal contains a section explaining ZWJ Zero-Width Joiner and character complexity
 **And** the modal contains a section explaining character vs code point counts
 **And** the modal contains a section explaining how to read the table columns
 **And** the modal contains practical examples using emoji data
