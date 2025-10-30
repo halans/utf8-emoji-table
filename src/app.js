@@ -572,9 +572,162 @@ function setupEventListeners() {
     });
 }
 
+/**
+ * Modal functionality for Unicode help guide
+ */
+
+// Modal elements
+let modal, modalContainer, helpTrigger, modalClose, modalBackdrop;
+let previouslyFocusedElement = null;
+
+/**
+ * Initialize modal functionality
+ */
+function initModal() {
+    modal = document.getElementById('help-modal');
+    modalContainer = modal.querySelector('.modal-container');
+    helpTrigger = document.getElementById('help-trigger');
+    modalClose = document.getElementById('modal-close');
+    modalBackdrop = modal.querySelector('.modal-backdrop');
+
+    // Event listeners
+    helpTrigger.addEventListener('click', showModal);
+    modalClose.addEventListener('click', hideModal);
+    modalBackdrop.addEventListener('click', hideModal);
+
+    // Keyboard event listeners
+    helpTrigger.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            showModal();
+        }
+    });
+
+    modalClose.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            hideModal();
+        }
+    });
+
+    // ESC key to close modal
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('show')) {
+            hideModal();
+        }
+    });
+
+    // Focus trap within modal
+    modal.addEventListener('keydown', trapFocus);
+}
+
+/**
+ * Show the modal with proper accessibility
+ */
+function showModal() {
+    // Store the currently focused element
+    previouslyFocusedElement = document.activeElement;
+
+    // Show modal
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden', 'false');
+
+    // Prevent body scroll
+    document.body.classList.add('modal-open');
+
+    // Focus the close button for keyboard users
+    setTimeout(() => {
+        modalClose.focus();
+    }, 150); // Small delay for animation
+
+    // Announce to screen readers
+    announceToScreenReader('Help guide opened');
+}
+
+/**
+ * Hide the modal and restore focus
+ */
+function hideModal() {
+    // Hide modal
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden', 'true');
+
+    // Restore body scroll
+    document.body.classList.remove('modal-open');
+
+    // Return focus to the trigger button
+    if (previouslyFocusedElement) {
+        setTimeout(() => {
+            previouslyFocusedElement.focus();
+            previouslyFocusedElement = null;
+        }, 150); // Small delay for animation
+    }
+
+    // Announce to screen readers
+    announceToScreenReader('Help guide closed');
+}
+
+/**
+ * Trap focus within the modal for accessibility
+ * @param {KeyboardEvent} e - Keyboard event
+ */
+function trapFocus(e) {
+    if (e.key !== 'Tab') return;
+
+    const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstFocusable = focusableElements[0];
+    const lastFocusable = focusableElements[focusableElements.length - 1];
+
+    if (e.shiftKey) {
+        // Shift + Tab: moving backwards
+        if (document.activeElement === firstFocusable) {
+            e.preventDefault();
+            lastFocusable.focus();
+        }
+    } else {
+        // Tab: moving forwards
+        if (document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+        }
+    }
+}
+
+/**
+ * Announce text to screen readers
+ * @param {string} message - Message to announce
+ */
+function announceToScreenReader(message) {
+    const announcement = document.createElement('div');
+    announcement.setAttribute('aria-live', 'polite');
+    announcement.setAttribute('aria-atomic', 'true');
+    announcement.className = 'sr-only';
+    announcement.style.position = 'absolute';
+    announcement.style.left = '-10000px';
+    announcement.style.width = '1px';
+    announcement.style.height = '1px';
+    announcement.style.overflow = 'hidden';
+    
+    document.body.appendChild(announcement);
+    announcement.textContent = message;
+    
+    // Remove after announcement
+    setTimeout(() => {
+        if (announcement.parentNode) {
+            announcement.parentNode.removeChild(announcement);
+        }
+    }, 1000);
+}
+
 // Initialize app when DOM is loaded
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
+    document.addEventListener('DOMContentLoaded', () => {
+        initApp();
+        initModal();
+    });
 } else {
     initApp();
+    initModal();
 }

@@ -31,8 +31,13 @@
 
         <!-- Search Controls -->
         <div id="search-controls" class="hidden">
-            <label for="search-input">Search emojis or names:</label>
-            <input type="text" id="search-input" placeholder="Type emoji or name..." />
+            <div class="search-input-container">
+                <label for="search-input">Search emojis or names:</label>
+                <input type="text" id="search-input" placeholder="Type emoji or name..." />
+                <button id="help-trigger" type="button" aria-label="Open Unicode help guide" title="Learn about Unicode and this table">
+                    <span class="help-icon">?</span>
+                </button>
+            </div>
             <span id="result-count"></span>
         </div>
 
@@ -99,9 +104,149 @@
     </main>
 
     <footer>
-        <p>Data source: Local Unicode Emoji Data Files (from unicode.org)</p>
+        <p>Data source: Local Unicode Emoji Data Files (from <a href="https://www.unicode.org/Public/emoji/latest/">unicode.org</a>)</p>
         <p>Click any emoji character to copy it to your clipboard</p>
     </footer>
+
+    <!-- Unicode Help Modal -->
+    <div id="help-modal" class="modal" role="dialog" aria-labelledby="modal-title" aria-describedby="modal-description" aria-hidden="true">
+        <div class="modal-backdrop" aria-hidden="true"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h2 id="modal-title">Unicode & Emoji Guide</h2>
+                <button id="modal-close" type="button" aria-label="Close help guide" title="Close help guide">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="modal-description">
+                <!-- Introduction -->
+                <section class="help-section">
+                    <h3>Welcome to the Emoji Table Viewer</h3>
+                    <p>This guide explains how Unicode works and how to read the emoji data in this table. Understanding these concepts will help you explore the fascinating technical side of emojis!</p>
+                </section>
+
+                <!-- Unicode Basics -->
+                <section class="help-section">
+                    <h3>What is Unicode?</h3>
+                    <p>Unicode is like a giant dictionary that assigns a unique number to every character, symbol, and emoji in the world. This ensures that a 😀 emoji looks the same whether you're texting on an iPhone in Tokyo or browsing the web on a computer in New York.</p>
+                    <p>Before Unicode, different computer systems used different character sets, which often led to garbled text when sharing files between systems.</p>
+                </section>
+
+                <!-- Code Points -->
+                <section class="help-section">
+                    <h3>Code Points Explained</h3>
+                    <p>Every Unicode character has a <strong>code point</strong> - its unique identification number written in the format <code>U+XXXX</code>. The "U+" means "Unicode" and the numbers/letters after it are the character's ID in hexadecimal.</p>
+                    <div class="example-box">
+                        <p><strong>Examples:</strong></p>
+                        <ul>
+                            <li>😀 = <code>U+1F600</code> (grinning face)</li>
+                            <li>❤️ = <code>U+2764</code> (red heart)</li>
+                            <li>🎉 = <code>U+1F389</code> (party popper)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- UTF-8 Encoding -->
+                <section class="help-section">
+                    <h3>UTF-8 Encoding</h3>
+                    <p>Computers can't directly store Unicode code points - they need to convert them into <strong>bytes</strong> (the computer's language). UTF-8 is the most popular way to do this conversion.</p>
+                    <p>The UTF-8 column shows these byte sequences. Each <code>\x</code> represents one byte in hexadecimal format. More complex emojis need more bytes!</p>
+                    <div class="example-box">
+                        <p><strong>Examples:</strong></p>
+                        <ul>
+                            <li>😀 → <code>\xF0\x9F\x98\x80</code> (4 bytes)</li>
+                            <li>© → <code>\xC2\xA9</code> (2 bytes)</li>
+                            <li>A → <code>\x41</code> (1 byte)</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Character Complexity -->
+                <section class="help-section">
+                    <h3>Simple vs Complex Characters</h3>
+                    <p>Some emojis are made from multiple code points combined together. The <strong>Count</strong> column shows how many code points make up each emoji:</p>
+                    <div class="example-box">
+                        <p><strong>Simple emojis (1 code point):</strong></p>
+                        <ul>
+                            <li>😀 = 1 code point = 4 bytes</li>
+                            <li>🎯 = 1 code point = 4 bytes</li>
+                        </ul>
+                        <p><strong>Skin tone variants (2 code points):</strong></p>
+                        <ul>
+                            <li>👋🏻 = base wave + light skin tone = 2 code points = 8 bytes</li>
+                            <li>🤝🏿 = base handshake + dark skin tone = 2 code points = 8 bytes</li>
+                        </ul>
+                        <p><strong>Complex sequences (3+ code points):</strong></p>
+                        <ul>
+                            <li>👨‍👩‍👧 = man + zero-width joiner + woman + zero-width joiner + girl = 5 code points</li>
+                            <li>🏴󠁧󠁢󠁥󠁮󠁧󠁿 = flag sequences can have many code points</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- Table Guide -->
+                <section class="help-section">
+                    <h3>Reading the Table</h3>
+                    <p>Each column provides different information about the emoji:</p>
+                    <ul>
+                        <li><strong>Code Point:</strong> The Unicode identifier (U+XXXX format)</li>
+                        <li><strong>Count:</strong> How many code points make up this emoji</li>
+                        <li><strong>Character:</strong> The actual emoji (click to copy!)</li>
+                        <li><strong>UTF-8:</strong> The byte sequence computers use to store it</li>
+                        <li><strong>Bytes:</strong> How much memory the emoji takes</li>
+                        <li><strong>Name:</strong> The official Unicode name</li>
+                    </ul>
+                    <p>💡 <strong>Tip:</strong> Click any column header to sort the data! Try sorting by bytes to see the most complex emojis.</p>
+                </section>
+
+                <!-- Examples -->
+                <section class="help-section">
+                    <h3>Detailed Examples</h3>
+                    <div class="example-detailed">
+                        <h4>Example 1: Simple Emoji</h4>
+                        <div class="example-breakdown">
+                            <span class="emoji-large">😀</span>
+                            <div class="breakdown-text">
+                                <p><strong>grinning face</strong></p>
+                                <p>Code Point: <code>U+1F600</code></p>
+                                <p>Count: 1 (just one code point)</p>
+                                <p>UTF-8: <code>\xF0\x9F\x98\x80</code></p>
+                                <p>Bytes: 4 (typical for emoji)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="example-detailed">
+                        <h4>Example 2: Skin Tone Variant</h4>
+                        <div class="example-breakdown">
+                            <span class="emoji-large">👋🏽</span>
+                            <div class="breakdown-text">
+                                <p><strong>waving hand: medium skin tone</strong></p>
+                                <p>Code Points: <code>U+1F44B U+1F3FD</code></p>
+                                <p>Count: 2 (base gesture + skin tone modifier)</p>
+                                <p>UTF-8: <code>\xF0\x9F\x91\x8B\xF0\x9F\x8F\xBD</code></p>
+                                <p>Bytes: 8 (4 bytes per code point)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="example-detailed">
+                        <h4>Example 3: Complex Sequence</h4>
+                        <div class="example-breakdown">
+                            <span class="emoji-large">👨‍💻</span>
+                            <div class="breakdown-text">
+                                <p><strong>man technologist</strong></p>
+                                <p>Code Points: <code>U+1F468 U+200D U+1F4BB</code></p>
+                                <p>Count: 3 (man + zero-width joiner + laptop)</p>
+                                <p>UTF-8: Complex byte sequence</p>
+                                <p>Bytes: 11 (varies by sequence complexity)</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
 
     <script src="parser.js"></script>
     <script src="app.js"></script>
