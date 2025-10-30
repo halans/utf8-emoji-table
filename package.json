@@ -1,0 +1,28 @@
+{
+  "name": "utf8-emoji-table",
+  "version": "1.0.0",
+  "description": "A lightweight web application for browsing and searching Unicode emojis with technical details",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "test": "echo 'Open http://localhost:8000/tests/test-runner.html in your browser' && python3 -m http.server 8000",
+    "serve": "python3 -m http.server 8000"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/utf8-emoji-table.git"
+  },
+  "keywords": [
+    "emoji",
+    "unicode",
+    "utf8",
+    "table",
+    "viewer",
+    "clipboard",
+    "search"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {},
+  "dependencies": {}
+}

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emoji Table Viewer</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Noto+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Emoji Table Viewer</h1>
+        <p>Browse and search Unicode emojis with technical details</p>
+    </header>
+
+    <main>
+        <!-- Loading State -->
+        <div id="loading-state" class="hidden">
+            <p>Loading emoji data...</p>
+            <div class="spinner"></div>
+        </div>
+
+        <!-- Error State -->
+        <div id="error-state" class="hidden">
+            <p class="error-message"></p>
+            <button id="retry-btn">Retry</button>
+        </div>
+
+        <!-- Search Controls -->
+        <div id="search-controls" class="hidden">
+            <label for="search-input">Search emojis or names:</label>
+            <input type="text" id="search-input" placeholder="Type emoji or name..." />
+            <span id="result-count"></span>
+        </div>
+
+        <!-- Pagination Controls (Top) -->
+        <div id="pagination-controls-top" class="pagination-controls hidden">
+            <div class="page-size-selector">
+                <label for="page-size-select">Items per page:</label>
+                <select id="page-size-select">
+                    <option value="128">128</option>
+                    <option value="256" selected>256</option>
+                    <option value="512">512</option>
+                    <option value="1024">1024</option>
+                </select>
+            </div>
+            <div class="page-navigation">
+                <button id="first-page">First</button>
+                <button id="prev-page">Previous</button>
+                <span id="page-info">Page 1 of 1</span>
+                <button id="next-page">Next</button>
+                <button id="last-page">Last</button>
+            </div>
+            <div id="item-range">Showing 0-0 of 0</div>
+        </div>
+
+        <!-- Table Container -->
+        <div id="table-container" class="hidden">
+            <table id="emoji-table">
+                <thead>
+                    <tr>
+                        <th>Code Point</th>
+                        <th>Character</th>
+                        <th>UTF-8</th>
+                        <th>Bytes</th>
+                        <th>Name</th>
+                    </tr>
+                </thead>
+                <tbody id="emoji-table-body">
+                    <!-- Rows inserted by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination Controls (Bottom) -->
+        <div id="pagination-controls-bottom" class="pagination-controls hidden">
+            <div class="page-navigation">
+                <button id="first-page-bottom">First</button>
+                <button id="prev-page-bottom">Previous</button>
+                <span id="page-info-bottom">Page 1 of 1</span>
+                <button id="next-page-bottom">Next</button>
+                <button id="last-page-bottom">Last</button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Data source: Local Unicode Emoji Data Files (from unicode.org)</p>
+        <p>Click any emoji character to copy it to your clipboard</p>
+    </footer>
+
+    <script src="parser.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
