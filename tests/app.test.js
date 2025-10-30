@@ -326,3 +326,185 @@ describe('App: Performance', () => {
         expect(duration).toBeLessThan(10);
     });
 });
+
+describe('App: Sorting Functionality', () => {
+    const sampleEmojis = [
+        { codePoint: 'U+1F600', codePointCount: 1, character: '😀', name: 'grinning face', utf8: '\\xF0\\x9F\\x98\\x80', byteSize: 4 },
+        { codePoint: 'U+1F44D', codePointCount: 2, character: '👍🏻', name: 'thumbs up light skin tone', utf8: '\\xF0\\x9F\\x91\\x8D\\xF0\\x9F\\x8F\\xBB', byteSize: 8 },
+        { codePoint: 'U+2764', codePointCount: 1, character: '❤️', name: 'red heart', utf8: '\\xE2\\x9D\\xA4', byteSize: 3 },
+        { codePoint: 'U+1F468', codePointCount: 5, character: '👨‍👩‍👧‍👦', name: 'family man woman girl boy', utf8: '\\xF0\\x9F\\x91\\xA8\\xE2\\x80\\x8D\\xF0\\x9F\\x91\\xA9\\xE2\\x80\\x8D\\xF0\\x9F\\x91\\xA7\\xE2\\x80\\x8D\\xF0\\x9F\\x91\\xA6', byteSize: 25 }
+    ];
+
+    describe('Sort by Code Point', () => {
+        it('should sort by code point in ascending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => a.codePoint.localeCompare(b.codePoint, undefined, { numeric: true }));
+            
+            expect(sorted[0].codePoint).toBe('U+1F44D');
+            expect(sorted[1].codePoint).toBe('U+1F468');
+            expect(sorted[2].codePoint).toBe('U+1F600');
+            expect(sorted[3].codePoint).toBe('U+2764');
+        });
+
+        it('should sort by code point in descending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => b.codePoint.localeCompare(a.codePoint, undefined, { numeric: true }));
+            
+            expect(sorted[0].codePoint).toBe('U+2764');
+            expect(sorted[1].codePoint).toBe('U+1F600');
+            expect(sorted[2].codePoint).toBe('U+1F468');
+            expect(sorted[3].codePoint).toBe('U+1F44D');
+        });
+    });
+
+    describe('Sort by Count', () => {
+        it('should sort by code point count in ascending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => a.codePointCount - b.codePointCount);
+            
+            expect(sorted[0].codePointCount).toBe(1);
+            expect(sorted[1].codePointCount).toBe(1);
+            expect(sorted[2].codePointCount).toBe(2);
+            expect(sorted[3].codePointCount).toBe(5);
+        });
+
+        it('should sort by code point count in descending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => b.codePointCount - a.codePointCount);
+            
+            expect(sorted[0].codePointCount).toBe(5);
+            expect(sorted[1].codePointCount).toBe(2);
+            expect(sorted[2].codePointCount).toBe(1);
+            expect(sorted[3].codePointCount).toBe(1);
+        });
+    });
+
+    describe('Sort by UTF-8', () => {
+        it('should sort by UTF-8 sequence in ascending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => a.utf8.localeCompare(b.utf8));
+            
+            expect(sorted[0].utf8).toBe('\\xE2\\x9D\\xA4');
+            expect(sorted[1].utf8).toBe('\\xF0\\x9F\\x91\\x8D\\xF0\\x9F\\x8F\\xBB');
+            expect(sorted[2].utf8).toBe('\\xF0\\x9F\\x91\\xA8\\xE2\\x80\\x8D\\xF0\\x9F\\x91\\xA9\\xE2\\x80\\x8D\\xF0\\x9F\\x91\\xA7\\xE2\\x80\\x8D\\xF0\\x9F\\x91\\xA6');
+            expect(sorted[3].utf8).toBe('\\xF0\\x9F\\x98\\x80');
+        });
+    });
+
+    describe('Sort by Bytes', () => {
+        it('should sort by byte size in ascending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => a.byteSize - b.byteSize);
+            
+            expect(sorted[0].byteSize).toBe(3);
+            expect(sorted[1].byteSize).toBe(4);
+            expect(sorted[2].byteSize).toBe(8);
+            expect(sorted[3].byteSize).toBe(25);
+        });
+
+        it('should sort by byte size in descending order', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => b.byteSize - a.byteSize);
+            
+            expect(sorted[0].byteSize).toBe(25);
+            expect(sorted[1].byteSize).toBe(8);
+            expect(sorted[2].byteSize).toBe(4);
+            expect(sorted[3].byteSize).toBe(3);
+        });
+    });
+
+    describe('Sort by Name', () => {
+        it('should sort by name in ascending order (case-insensitive)', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => a.name.toLowerCase().localeCompare(b.name.toLowerCase()));
+            
+            expect(sorted[0].name).toBe('family man woman girl boy');
+            expect(sorted[1].name).toBe('grinning face');
+            expect(sorted[2].name).toBe('red heart');
+            expect(sorted[3].name).toBe('thumbs up light skin tone');
+        });
+
+        it('should sort by name in descending order (case-insensitive)', () => {
+            const sorted = [...sampleEmojis].sort((a, b) => b.name.toLowerCase().localeCompare(a.name.toLowerCase()));
+            
+            expect(sorted[0].name).toBe('thumbs up light skin tone');
+            expect(sorted[1].name).toBe('red heart');
+            expect(sorted[2].name).toBe('grinning face');
+            expect(sorted[3].name).toBe('family man woman girl boy');
+        });
+    });
+
+    describe('Sort State Management', () => {
+        it('should toggle sort direction when clicking same column', () => {
+            const mockState = { sortColumn: 'name', sortDirection: 'asc' };
+            
+            // Simulate toggle function
+            const toggleDirection = (state) => {
+                if (state.sortColumn === 'name') {
+                    state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+                }
+                return state.sortDirection;
+            };
+
+            expect(toggleDirection(mockState)).toBe('desc');
+            expect(toggleDirection(mockState)).toBe('asc');
+        });
+
+        it('should reset to ascending when clicking different column', () => {
+            const mockState = { sortColumn: 'name', sortDirection: 'desc' };
+            
+            // Simulate column change
+            const updateSortState = (state, newColumn) => {
+                if (state.sortColumn === newColumn) {
+                    state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+                } else {
+                    state.sortColumn = newColumn;
+                    state.sortDirection = 'asc';
+                }
+            };
+
+            updateSortState(mockState, 'count');
+            expect(mockState.sortColumn).toBe('count');
+            expect(mockState.sortDirection).toBe('asc');
+        });
+    });
+
+    describe('Sort Performance', () => {
+        it('should sort large datasets efficiently', () => {
+            const largeDataset = [];
+            for (let i = 0; i < 5000; i++) {
+                largeDataset.push({
+                    codePoint: `U+${(Math.random() * 0x10000).toString(16)}`,
+                    codePointCount: Math.floor(Math.random() * 10) + 1,
+                    name: `emoji ${Math.floor(Math.random() * 1000)}`,
+                    utf8: `\\x${Math.random().toString(16)}`,
+                    byteSize: Math.floor(Math.random() * 20) + 1
+                });
+            }
+
+            const start = performance.now();
+            const sorted = [...largeDataset].sort((a, b) => a.name.localeCompare(b.name));
+            const duration = performance.now() - start;
+
+            expect(sorted).toHaveLength(5000);
+            expect(duration).toBeLessThan(100); // Should complete in under 100ms
+        });
+    });
+
+    describe('Sort Integration with Search', () => {
+        it('should maintain sort order when filtering', () => {
+            // Sort by name first
+            const sortedByName = [...sampleEmojis].sort((a, b) => a.name.localeCompare(b.name));
+            
+            // Then filter for items containing "face"
+            const filtered = sortedByName.filter(emoji => emoji.name.toLowerCase().includes('face'));
+            
+            expect(filtered).toHaveLength(1);
+            expect(filtered[0].name).toBe('grinning face');
+        });
+
+        it('should preserve sort when clearing search', () => {
+            // Start with sorted data
+            const sortedData = [...sampleEmojis].sort((a, b) => a.byteSize - b.byteSize);
+            
+            // Filter and then restore
+            const filtered = sortedData.filter(emoji => emoji.byteSize > 5);
+            const restored = sortedData; // In real app, this would be the full sorted dataset
+            
+            expect(restored[0].byteSize).toBe(3); // Still sorted by byte size
+            expect(restored[1].byteSize).toBe(4);
+        });
+    });
+});

@@ -6,7 +6,9 @@ const state = {
     filteredEmojis: [],
     currentPage: 1,
     pageSize: 256,
-    searchQuery: ''
+    searchQuery: '',
+    sortColumn: null,
+    sortDirection: 'asc'
 };
 
 // Local emoji file paths
@@ -15,6 +17,117 @@ const EMOJI_FILES = {
     sequences: 'emoji-sequences.txt',
     zwj: 'emoji-zwj-sequences.txt'
 };
+
+/**
+ * Toggle sort direction for the current column
+ * @returns {string} New sort direction
+ */
+function toggleSortDirection() {
+    state.sortDirection = state.sortDirection === 'asc' ? 'desc' : 'asc';
+    return state.sortDirection;
+}
+
+/**
+ * Update sort state for a specific column
+ * @param {string} column - Column name to sort by
+ */
+function updateSortState(column) {
+    if (state.sortColumn === column) {
+        toggleSortDirection();
+    } else {
+        state.sortColumn = column;
+        state.sortDirection = 'asc';
+    }
+}
+
+/**
+ * Sort emojis by code point (alphanumeric comparison)
+ * @param {Array} emojis - Array of emoji objects
+ * @param {string} direction - 'asc' or 'desc'
+ * @returns {Array} Sorted array
+ */
+function sortByCodePoint(emojis, direction) {
+    return [...emojis].sort((a, b) => {
+        const comparison = a.codePoint.localeCompare(b.codePoint, undefined, { numeric: true });
+        return direction === 'asc' ? comparison : -comparison;
+    });
+}
+
+/**
+ * Sort emojis by code point count (numeric comparison)
+ * @param {Array} emojis - Array of emoji objects
+ * @param {string} direction - 'asc' or 'desc'
+ * @returns {Array} Sorted array
+ */
+function sortByCount(emojis, direction) {
+    return [...emojis].sort((a, b) => {
+        const comparison = a.codePointCount - b.codePointCount;
+        return direction === 'asc' ? comparison : -comparison;
+    });
+}
+
+/**
+ * Sort emojis by UTF-8 literal (string comparison)
+ * @param {Array} emojis - Array of emoji objects
+ * @param {string} direction - 'asc' or 'desc'
+ * @returns {Array} Sorted array
+ */
+function sortByUtf8(emojis, direction) {
+    return [...emojis].sort((a, b) => {
+        const comparison = a.utf8.localeCompare(b.utf8);
+        return direction === 'asc' ? comparison : -comparison;
+    });
+}
+
+/**
+ * Sort emojis by byte size (numeric comparison)
+ * @param {Array} emojis - Array of emoji objects
+ * @param {string} direction - 'asc' or 'desc'
+ * @returns {Array} Sorted array
+ */
+function sortByBytes(emojis, direction) {
+    return [...emojis].sort((a, b) => {
+        const comparison = a.byteSize - b.byteSize;
+        return direction === 'asc' ? comparison : -comparison;
+    });
+}
+
+/**
+ * Sort emojis by name (alphabetical comparison, case-insensitive)
+ * @param {Array} emojis - Array of emoji objects
+ * @param {string} direction - 'asc' or 'desc'
+ * @returns {Array} Sorted array
+ */
+function sortByName(emojis, direction) {
+    return [...emojis].sort((a, b) => {
+        const comparison = a.name.toLowerCase().localeCompare(b.name.toLowerCase());
+        return direction === 'asc' ? comparison : -comparison;
+    });
+}
+
+/**
+ * Generic sort dispatcher function
+ * @param {Array} emojis - Array of emoji objects
+ * @param {string} column - Column to sort by
+ * @param {string} direction - 'asc' or 'desc'
+ * @returns {Array} Sorted array
+ */
+function sortEmojis(emojis, column, direction) {
+    switch (column) {
+        case 'codePoint':
+            return sortByCodePoint(emojis, direction);
+        case 'count':
+            return sortByCount(emojis, direction);
+        case 'utf8':
+            return sortByUtf8(emojis, direction);
+        case 'bytes':
+            return sortByBytes(emojis, direction);
+        case 'name':
+            return sortByName(emojis, direction);
+        default:
+            return emojis;
+    }
+}
 
 /**
  * Fetch all Unicode emoji files in parallel
@@ -265,6 +378,9 @@ function performSearch(query) {
         );
     }
 
+    // Apply current sorting to filtered results
+    applySorting();
+
     state.currentPage = 1; // Reset to first page
     updatePagination();
     updateResultCount();
@@ -335,6 +451,49 @@ function showCopyFeedback(element) {
 }
 
 /**
+ * Handle sorting when a column header is clicked
+ * @param {string} column - Column to sort by
+ */
+function handleSort(column) {
+    updateSortState(column);
+    applySorting();
+    updateSortIndicators();
+    state.currentPage = 1; // Reset to first page
+    updatePagination();
+    renderTable();
+}
+
+/**
+ * Apply sorting to the filtered emojis
+ */
+function applySorting() {
+    if (state.sortColumn) {
+        state.filteredEmojis = sortEmojis(state.filteredEmojis, state.sortColumn, state.sortDirection);
+    }
+}
+
+/**
+ * Update visual sort indicators in table headers
+ */
+function updateSortIndicators() {
+    // Remove all existing sort classes and reset ARIA attributes
+    document.querySelectorAll('th.sortable').forEach(header => {
+        header.classList.remove('sort-asc', 'sort-desc');
+        header.setAttribute('aria-sort', 'none');
+    });
+
+    // Add appropriate class and ARIA attribute to current sort column
+    if (state.sortColumn) {
+        const activeHeader = document.querySelector(`th[data-column="${state.sortColumn}"]`);
+        if (activeHeader) {
+            const sortClass = state.sortDirection === 'asc' ? 'sort-asc' : 'sort-desc';
+            activeHeader.classList.add(sortClass);
+            activeHeader.setAttribute('aria-sort', state.sortDirection === 'asc' ? 'ascending' : 'descending');
+        }
+    }
+}
+
+/**
  * Set up all event listeners
  */
 function setupEventListeners() {
@@ -394,6 +553,22 @@ function setupEventListeners() {
     // Retry button
     document.getElementById('retry-btn').addEventListener('click', () => {
         initApp();
+    });
+
+    // Sortable column headers
+    document.querySelectorAll('th.sortable').forEach(header => {
+        // Click event
+        header.addEventListener('click', () => {
+            handleSort(header.dataset.column);
+        });
+
+        // Keyboard support
+        header.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleSort(header.dataset.column);
+            }
+        });
     });
 }
 
