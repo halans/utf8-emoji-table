@@ -69,6 +69,7 @@ function parseEmojiTest(fileContent) {
 
             emojis.push({
                 codePoint,
+                codePointCount: codePoints.length,
                 character,
                 utf8,
                 byteSize,
@@ -123,6 +124,7 @@ function parseEmojiSequences(fileContent) {
 
             emojis.push({
                 codePoint,
+                codePointCount: codePoints.length,
                 character,
                 utf8,
                 byteSize,
@@ -177,6 +179,7 @@ function parseEmojiZWJ(fileContent) {
 
             emojis.push({
                 codePoint,
+                codePointCount: codePoints.length,
                 character,
                 utf8,
                 byteSize,

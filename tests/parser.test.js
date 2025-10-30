@@ -34,6 +34,7 @@ describe('Parser: parseEmojiTest', () => {
 
         expect(result).toHaveLength(1);
         expect(result[0].codePoint).toBe('U+1F600');
+        expect(result[0].codePointCount).toBe(1);
         expect(result[0].character).toBe('😀');
         expect(result[0].name).toBe('grinning face');
         expect(result[0].source).toBe('emoji-test.txt');
@@ -105,6 +106,48 @@ INVALID LINE
         expect(result[0].character).toBe('😀');
         expect(result[1].character).toBe('😃');
         expect(result[2].character).toBe('😄');
+    });
+});
+
+describe('Parser: Code Point Count', () => {
+    it('should calculate correct code point count for single code point emojis', () => {
+        const input = '1F600 ; fully-qualified # 😀 E1.0 grinning face';
+        const result = parseEmojiTest(input);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].codePointCount).toBe(1);
+    });
+
+    it('should calculate correct code point count for multi-code point emojis', () => {
+        const input = '1F44D 1F3FB ; fully-qualified # 👍🏻 E1.0 thumbs up: light skin tone';
+        const result = parseEmojiTest(input);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].codePointCount).toBe(2);
+    });
+
+    it('should calculate correct code point count for ZWJ sequences', () => {
+        const input = '1F468 200D 1F373 ; RGI_Emoji_ZWJ_Sequence ; man cook';
+        const result = parseEmojiZWJ(input);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].codePointCount).toBe(3);
+    });
+
+    it('should calculate correct code point count for complex ZWJ sequences', () => {
+        const input = '1F468 200D 1F469 200D 1F467 200D 1F466 ; RGI_Emoji_ZWJ_Sequence ; family: man, woman, girl, boy';
+        const result = parseEmojiZWJ(input);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].codePointCount).toBe(7);
+    });
+
+    it('should calculate correct code point count for emoji sequences', () => {
+        const input = '0023 FE0F 20E3 ; RGI_Emoji_Keycap_Sequence ; keycap: #';
+        const result = parseEmojiSequences(input);
+
+        expect(result).toHaveLength(1);
+        expect(result[0].codePointCount).toBe(3);
     });
 });
 

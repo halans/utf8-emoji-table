@@ -280,6 +280,14 @@ main {
     font-weight: 500;
 }
 
+.count {
+    font-family: 'Courier New', Courier, monospace;
+    color: #2980b9;
+    font-weight: 600;
+    text-align: center;
+    width: 60px;
+}
+
 .character {
     font-size: 24px;
     text-align: center;

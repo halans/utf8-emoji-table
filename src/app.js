@@ -197,7 +197,7 @@ function renderTable() {
     if (state.filteredEmojis.length === 0) {
         tbody.innerHTML = `
             <tr class="empty-state">
-                <td colspan="5">No emojis found${state.searchQuery ? ` matching "${state.searchQuery}"` : ''}</td>
+                <td colspan="6">No emojis found${state.searchQuery ? ` matching "${state.searchQuery}"` : ''}</td>
             </tr>
         `;
         return;
@@ -216,6 +216,7 @@ function renderTable() {
 
         tr.innerHTML = `
             <td class="code-point">${emoji.codePoint}</td>
+            <td class="count">${emoji.codePointCount}</td>
             <td class="character" data-emoji="${emoji.character}" tabindex="0" role="button" aria-label="Click to copy ${emoji.name}">${emoji.character}</td>
             <td class="utf8">${emoji.utf8}</td>
             <td class="byte-size">${emoji.byteSize}</td>
